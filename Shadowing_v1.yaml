@@ -1,0 +1,455 @@
+openapi: 3.0.0
+info:
+  description: "Swagger file to draft out the API structure for shadowing.com. The website's purpose is to link physicians and pre-medical students, helping make shadowing more accessible to more students."
+  version: "1.0.0"
+  title: "Shadowing.com"
+servers:
+  - url: "http://api.shadowing.com/v1:"
+    description: "example server address for shadowing.com"
+tags:
+- name: "student"
+  description: "Operations about the student users"
+- name: "doctor"
+  description: "Operations about the doctor users"
+- name: "requests"
+  description: "Access and create requests for shadowing"
+- name: "admin"
+  description: "Get admin details for shadowing.com"
+paths:
+  /student:
+    post:
+      tags:
+      - "student"
+      summary: "Add a new student"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Student"
+      responses:
+        201:
+          description: "Created"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+    put:
+      tags:
+      - "student"
+      summary: "Update an existing student"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Student"
+      responses:
+        200:
+          description: "The updated student object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Student Not Found"
+        500:
+          description: "Internal Server Error"
+    get:
+      tags:
+      - "student"
+      summary: "Get an existing student"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "email of student that needs to be fetched"
+        required: true
+        schema:
+          type : "string"
+          format: "email"
+      responses:
+        200:
+          description: "The fetched student object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Student"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Student Not Found"
+        500:
+          description: "Internal Server Error"
+    delete:
+      tags:
+      - "student"
+      summary: "Delete an existing student"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "email of student that needs to be fetched"
+        required: true
+        schema:
+          type : "string"
+          format: "email"
+      responses:
+        204:
+          description: "No Content"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Student Not Found"
+        500:
+          description: "Internal Server Error"
+  /doctor:
+    post:
+      tags:
+      - "doctor"
+      summary: "Add a new doctor"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Doctor"
+      responses:
+        201:
+          description: "Created"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+    put:
+      tags:
+      - "doctor"
+      summary: "Update an existing doctor"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Doctor"
+      responses:
+        200:
+          description: "The updated doctor object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Doctor"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Doctor Not Found"
+        500:
+          description: "Internal Server Error"
+    get:
+      tags:
+      - "doctor"
+      summary: "Get an existing doctor"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "email of doctor that needs to be fetched"
+        required: true
+        schema:
+          type: "string"
+          format: "email"
+      responses:
+        200:
+          description: "The fetched doctor object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Doctor"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Doctor Not Found"
+        500:
+          description: "Internal Server Error"
+    delete:
+      tags:
+      - "doctor"
+      summary: "Delete an existing doctor"
+      parameters:
+      - name: "email"
+        in: "path"
+        description: "email of doctor that needs to be deleted"
+        required: true
+        schema:
+          type: "string"
+          format: "email"
+      responses:
+        204:
+          description: "No Content"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Doctor Not Found"
+        500:
+          description: "Internal Server Error"
+  /doctors:
+    get:
+      tags:
+        - "doctor"
+      summary: "Get a list of doctors based on a certain location"
+      parameters:
+      - name: "zipCode"
+        in: "query"
+        description: "zipCodes where physicans should be found"
+        required: false
+        schema:
+          type: "integer"
+          format: "int64"
+      - name: "approved"
+        in: "query"
+        description: "A query to get all physicians whose status has not been approved"
+        required: false
+        schema:
+          type: "boolean"
+      responses:
+        200:
+          description: "A list of all the doctors within the queried location"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Doctor"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Doctors Not Found"
+        500:
+          description: "Internal Server Error"
+  /request:
+    post:
+      tags:
+      - "requests"
+      summary: "Create a new shadowing request"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+    get:
+      tags:
+      - "requests"
+      summary: "Get an existing shadowing request"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of request to be fetched"
+        required: true
+        schema:
+          type: "integer"
+          format: "int64"
+      responses:
+        200:
+          description: "The fetched request object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Request Not Found"
+        500:
+          description: "Internal Server Error"
+  /requests:
+    get:
+      tags:
+      - "requests"
+      summary: "Get all shadowing requests that meet query criteria"
+      parameters:
+      - name: "studentRequest"
+        in: "query"
+        description: "email of the student whose active requests should be returned"
+        required: true
+        schema:
+          type: "string"
+          format: "email"
+      - name: "doctorRequest"
+        in: "query"
+        description: "email of the doctor whose active requests should be returned"
+        required: true
+        schema:
+          type: "string"
+          format: "email"
+      - name: "startDate"
+        in: "query"
+        description: "Initial date in a range of dates to return"
+        required: true
+        schema:
+          type: "string"
+          format: "date-time"
+      - name: "endDate"
+        in: "query"
+        description: "Final date in a range of dates to return"
+        required: true
+        schema:
+          type: "string"
+          format: "date-time"
+      responses:
+        200:
+          description: "The fetched request object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Request"
+        400:
+          description: "Bad Request"
+        404:
+          description: "Request Not Found"
+        500:
+          description: "Internal Server Error"
+  /admin:
+    get:
+      tags:
+      - "admin"
+      summary: "Get admin details for shadowing.com"
+      responses:
+        200:
+          description: "The fetched admin object"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Admin"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+components:
+  schemas:
+    Scheduling:
+      type: "array"
+      items:
+        type: "object"
+        properties: 
+          dayOfWeek: 
+            type: "integer"
+            minimum: 0
+            maximum: 6
+          allow: 
+            type: "boolean"
+            default: true
+          startTime:
+            type: "integer"
+            minimum: 0
+            maximum: 23
+          endTime:
+            type: "integer"
+            minimum: 0
+            maximum: 23
+    Address:
+      type: "object"
+      properties:
+        streetAddress: 
+          type: "string"
+        city:
+          type: "string"
+        state:
+          type: "string"
+        zipCode:
+          type: "integer"
+          format: "int64"
+    Student:
+      type: "object"
+      required:
+      - "email"
+      properties:
+        email:
+          type: "string"
+        phoneNumber:
+          type: "string"
+        name:
+          type: "string"
+        address:
+          $ref: "#/components/schemas/Address"
+        hippaCert:
+          type: "boolean"
+        createdDate:
+          type: "string"
+          format: "date-time"
+        requests:
+          type: "array"
+          items: 
+            type: "integer"
+    Doctor:
+      type: "object"
+      required:
+      - "email"
+      properties:
+        email:
+          type: "string"
+        phoneNumber:
+          type: "string"
+        name:
+          type: "string"
+        degree:
+          type: "string"
+          enum:
+          - "MD"
+          - "DO"
+        specialty:
+          type: "string"
+        address:
+          $ref: "#/components/schemas/Address"
+        scheduling:
+          $ref: "#/components/schemas/Scheduling"
+        comments:
+          type: "string"
+        shiftLength:
+          type: "array"
+          items:
+            type: "integer"
+          minItems: 2
+        maxRequests:
+          type: "integer"
+          minimum: 1
+        badgePhoto:
+          type: "string"
+        approved:
+          type: "boolean"
+          default: false
+        createdDate:
+          type: "string"
+          format: "date-time"
+        requests:
+          type: "array"
+          items: 
+            type: "integer"
+    Request: 
+      type: "object"
+      properties:
+        createdDate:
+          type: "string"
+          format: "date-time"
+        studentRequest: 
+          type: "string"
+          format: "email"
+        doctorRequest:
+          type: "string"
+          format: "email"
+        scheduling:
+          $ref: "#/components/schemas/Scheduling"
+    Admin: 
+      type: "object"
+      properties:
+        numberOfStudents:
+          type: "integer"
+          format: "int64"
+        numberOfDoctors:
+          type: "integer"
+          format: "int64"
+        numberOfRequests:
+          type: "integer"
+          format: "int64"
