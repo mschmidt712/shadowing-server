@@ -1,0 +1,14 @@
+{
+  "name": "shadowing-server",
+  "version": "1.0.0",
+  "description": "Backend lambda and accessory resources for shadowing.com",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marie Schmidt",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.430.0"
+  }
+}
