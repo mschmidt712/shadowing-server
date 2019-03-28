@@ -1,11 +1,11 @@
 const AWS = require('aws-sdk');
 const joi = require('joi');
-const studentSchema = require('./student-schema.js');
+const doctorSchema = require('./doctor-schema.js');
 
 exports.handler = (event, context, callback) => {
   let response;
-  let student = event.student;
-  const validatedInput = joi.validate(student, studentSchema.schema, {
+  let doctor = event.doctor;
+  const validatedInput = joi.validate(doctor, doctorSchema.schema, {
       stripUnknown: true
     })
     .then(value => value)
@@ -21,13 +21,13 @@ exports.handler = (event, context, callback) => {
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
   let params;
 
-  validatedInput.then(validatedStudent => {
-    student = validatedStudent;
+  validatedInput.then(validatedDoctor => {
+    doctor = validatedDoctor;
 
     params = {
-      TableName : 'students',
+      TableName : 'doctors',
       Key: {
-        email: validatedStudent.email
+        email: doctor.email
       }
     }
       return dynamodb.get(params).promise();
@@ -42,15 +42,15 @@ exports.handler = (event, context, callback) => {
     }
 
     params = {
-      TableName: 'students',
-      Item: student,
+      TableName: 'doctors',
+      Item: doctor,
       ReturnValues: 'ALL_OLD'
     };
     return dynamodb.put(params).promise();
   }).then(resp => {
     response = {
       statusCode: 200,
-      body: JSON.stringify(student)
+      body: JSON.stringify(doctor)
     };
 
     callback(null, response);
@@ -59,7 +59,7 @@ exports.handler = (event, context, callback) => {
       statusCode: 500, 
       body: JSON.stringify(err)
     };
-
+    
     callback(response);
   });
 };
