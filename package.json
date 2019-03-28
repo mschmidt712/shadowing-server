@@ -4,11 +4,13 @@
   "description": "Backend lambda and accessory resources for shadowing.com",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "credentials": "node aws-credentials.js"
   },
   "author": "Marie Schmidt",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.430.0"
+    "aws-sdk": "^2.430.0",
+    "joi": "^14.3.1"
   }
 }
