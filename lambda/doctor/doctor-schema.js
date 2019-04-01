@@ -9,9 +9,9 @@ exports.schema = joi.object().keys({
     address: joi.object().keys({
         streetAddress: joi.string(),
         city: joi.string(),
-        state: joi.string().uppercase().length(2),
-        zipCode: joi.number().integer().required()
+        state: joi.string().uppercase().length(2)
     }),
+    zipCode: joi.number().integer().required(),
     scheduling: joi.array().length(7).required(),
     shiftLength: joi.array().length(2).required(),
     maxRequests: joi.number().integer().min(1),
