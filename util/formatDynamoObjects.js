@@ -1,6 +1,4 @@
 exports.formatObject = function formatObject (obj, formattedObject, originalKey) {
-    const keys = Object.keys(obj);
-    
     for (const key in obj) {
       let newKey = originalKey ? originalKey : key;
       
