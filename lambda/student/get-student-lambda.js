@@ -20,6 +20,15 @@ exports.handler = (event, context, callback) => {
    };
 
   dynamodb.get(params).promise().then(data => {
+    if (!data.Item) {
+      response = {
+        statusCode: 404,
+        body: JSON.stringify('No student found with given student email. Please try your request again.')
+      };
+  
+      callback(response);
+    }
+
     response = {
       statusCode: 200,
       body: JSON.stringify(data.Item)
