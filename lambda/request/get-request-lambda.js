@@ -7,9 +7,9 @@ exports.handler = (event, context, callback) => {
   if (!uuid) {
     response = {
       statusCode: 400, 
-      body: JSON.stringify('An ID is required to fetch a unique request')
+      body: 'An ID is required to fetch a unique request'
     }
-    callback(response);
+    callback(JSON.stringify(response));
   }
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -25,9 +25,9 @@ exports.handler = (event, context, callback) => {
     if (!data.Item) {
       response = {
         statusCode: 404,
-        body: JSON.stringify('No request found with the provided uuid')
+        body: 'No request found with the provided uuid'
       };
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     response = {
@@ -38,8 +38,8 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

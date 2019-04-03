@@ -31,9 +31,9 @@ exports.handler = (event, context, callback) => {
   if (event.startDate && !event.endDate || event.endDate && !event.startDate) {
     response = {
       statusCode: 400,
-      body: JSON.stringify('Both a start date and an end date must be provided to query by date range.')
+      body: 'Both a start date and an end date must be provided to query by date range.'
     }
-    callback(response);
+    callback(JSON.stringify(response));
   } else if (event.startDate && event.endDate) {
     queryByDate = true;
   }
@@ -51,9 +51,9 @@ exports.handler = (event, context, callback) => {
     if (results.length == 0) {
       response = {
         statusCode: 404,
-        body: JSON.stringify('No request found that matches given query. Please try your request again.')
+        body: 'No request found that matches given query. Please try your request again.'
       };
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     response = {
@@ -64,19 +64,20 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };
 
 // Date Query Helper Functions
 function validateDates(startDate, endDate, callback) {
   if (moment(startDate).isSameOrAfter(endDate)) {
-    callback({
+    const response = {
       statusCode: 400,
-      body: JSON.stringify('Start date must be before the end date.')
-    });
+      body: 'Start date must be before the end date.'
+    }
+    callback(JSON.stringify(response));
   }
 }
 

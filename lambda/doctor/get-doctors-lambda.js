@@ -5,21 +5,21 @@ const formatZipCodes = require('./formatZipCodes').formatZipCodes;
 exports.handler = (event, context, callback) => {
 
   let response = {};
-  if (event.approved == true || event.approved == false) {
+  if (typeof event.approved === 'boolean') {
     approvedQuery = event.approved
   } else {
     approvedQuery = undefined;
   }
-  const zipCodeQuery = event.zipCode ? event.zipCode : undefined;
-  const distanceQuery = event.distance ? event.distance : undefined;
+  const zipCodeQuery = event.zipCode !== '' ? event.zipCode : undefined;
+  const distanceQuery = event.distance !== '' ? event.distance : undefined;
 
   if (zipCodeQuery && !distanceQuery || distanceQuery && !zipCodeQuery) {
     response = {
       statusCode: 400, 
-      body: JSON.stringify('Both a zip code and distance radius is required to locate doctors by area.')
+      body: 'Both a zip code and distance radius is required to locate doctors by area.'
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   }
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -66,10 +66,10 @@ exports.handler = (event, context, callback) => {
     if (!data.length) {
       response = {
         statusCode: 404,
-        body: JSON.stringify('No doctors found matching your search criteria')
+        body: 'No doctors found matching your search criteria'
       };
 
-      callback(response);
+      callback(JSON.stringify(response));
     }
     response = {
       statusCode: 200,
@@ -80,9 +80,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

@@ -2,6 +2,8 @@ const AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
   const studentEmail = event.email;
+  let response; 
+
   if (!studentEmail) {
     response = {
       statusCode: 400, 
@@ -23,10 +25,10 @@ exports.handler = (event, context, callback) => {
     if (!data.Item) {
       response = {
         statusCode: 404,
-        body: JSON.stringify('No student found with given student email. Please try your request again.')
+        body: 'No student found with given student email. Please try your request again.'
       };
   
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     response = {
@@ -38,9 +40,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

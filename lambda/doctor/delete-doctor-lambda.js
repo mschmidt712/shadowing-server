@@ -6,10 +6,10 @@ exports.handler = (event, context, callback) => {
   if (!doctorEmail) {
     response = {
       statusCode: 400, 
-      body: JSON.stringify('An email is required to delete a doctor profile')
+      body: 'An email is required to delete a doctor profile'
     }
 
-    callback(response);
+    callback(JSON.stringify(response));
   }
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -30,9 +30,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

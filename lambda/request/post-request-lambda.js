@@ -19,10 +19,10 @@ exports.handler = (event, context, callback) => {
     .catch(err => {
       response = {
         statusCode: 400, 
-        body: JSON.stringify(err)
+        body: err
       }
 
-      callback(response);
+      callback(JSON.stringify(response));
     });
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -43,9 +43,9 @@ exports.handler = (event, context, callback) => {
     if (!results.Item) {
       response = {
         statusCode: 400, 
-        body: JSON.stringify('Student does not exist in the database')
+        body: 'Student does not exist in the database'
       };
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     params = {
@@ -59,9 +59,9 @@ exports.handler = (event, context, callback) => {
     if (!results.Item) {
       response = {
         statusCode: 400, 
-        body: JSON.stringify('Doctor does not exist in the database')
+        body: 'Doctor does not exist in the database'
       };
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     params = {
@@ -79,9 +79,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

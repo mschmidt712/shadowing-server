@@ -1,15 +1,16 @@
 const AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
+  let response;
   const doctorEmail = event.email;
 
   if (!doctorEmail) {
     response = {
       statusCode: 400, 
-      body: JSON.stringify('An email is required to fetch a doctor profile')
+      body: 'An email is required to fetch a doctor profile'
     }
 
-    callback(response);
+    callback(JSON.stringify(response));
   }
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -25,10 +26,10 @@ exports.handler = (event, context, callback) => {
     if (!data.Item) {
       response = {
         statusCode: 404,
-        body: JSON.stringify('No doctor found with given doctor email. Please try your request again.')
+        body: 'No doctor found with given doctor email. Please try your request again.'
       };
   
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     response = {
@@ -40,9 +41,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
 
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };

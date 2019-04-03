@@ -12,10 +12,10 @@ exports.handler = (event, context, callback) => {
     .catch(err => {
       response = {
         statusCode: 400, 
-        body: JSON.stringify(err)
+        body: err
       }
 
-      callback(response);
+      callback(JSON.stringify(response));
     });
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
@@ -35,10 +35,10 @@ exports.handler = (event, context, callback) => {
     if (!results) {
       response = {
         statusCode: 400, 
-        body: JSON.stringify('User does not exist in the database')
+        body: 'User does not exist in the database'
       };
 
-      callback(response);
+      callback(JSON.stringify(response));
     }
 
     params = {
@@ -57,9 +57,9 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500, 
-      body: JSON.stringify(err)
+      body: err
     };
     
-    callback(response);
+    callback(JSON.stringify(response));
   });
 };
