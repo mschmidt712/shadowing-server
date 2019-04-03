@@ -3,10 +3,11 @@ const zipcodes = require('zipcodes');
 const formatZipCodes = require('./formatZipCodes').formatZipCodes;
 
 exports.handler = (event, context, callback) => {
-
   let response = {};
-  if (typeof event.approved === 'boolean') {
-    approvedQuery = event.approved
+  let approvedQuery;
+
+  if (event.approved == 'true' || event.approved == 'false' && event.approved !== '') {
+    approvedQuery = event.approved === 'true' ? true : false;
   } else {
     approvedQuery = undefined;
   }
@@ -29,7 +30,7 @@ exports.handler = (event, context, callback) => {
    };
   let items = [];
 
-  if (approvedQuery !== undefined && !zipCodeQuery && !distanceQuery) {
+  if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {
     params = Object.assign(params, {
       FilterExpression: 'approved = :approved_bool',
       ExpressionAttributeValues: {
