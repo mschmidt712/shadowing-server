@@ -2,33 +2,33 @@ const AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
   let response;
-  const doctorEmail = event.email;
+  const doctorId = event.id;
 
-  if (!doctorEmail) {
+  if (!doctorId) {
     response = {
-      statusCode: 400, 
-      body: 'An email is required to fetch a doctor profile'
+      statusCode: 400,
+      body: 'An ID is required to fetch a doctor profile'
     }
 
     callback(JSON.stringify(response));
   }
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
   var params = {
     Key: {
-     "email": doctorEmail
-    }, 
+      "id": doctorId
+    },
     TableName: "doctors"
-   };
+  };
 
   dynamodb.get(params).promise().then(data => {
     if (!data.Item) {
       response = {
         statusCode: 404,
-        body: 'No doctor found with given doctor email. Please try your request again.'
+        body: 'No doctor found with given doctor ID. Please try your request again.'
       };
-  
+
       callback(JSON.stringify(response));
     }
 
@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 

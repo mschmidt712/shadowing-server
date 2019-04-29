@@ -6,37 +6,37 @@ exports.handler = (event, context, callback) => {
   let response;
   let doctor = event.doctor;
   const validatedInput = joi.validate(doctor, doctorSchema.schema, {
-      stripUnknown: true
-    })
+    stripUnknown: true
+  })
     .then(value => {
       value.createdDate = new Date().toISOString();
       return value;
     })
     .catch(err => {
       response = {
-        statusCode: 400, 
+        statusCode: 400,
         body: err
       }
 
       callback(JSON.stringify(response));
     });
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
   let params;
 
   validatedInput.then(validatedDoctor => {
     doctor = validatedDoctor;
     params = {
-      TableName : 'doctors',
+      TableName: 'doctors',
       Key: {
-        email: doctor.email
+        id: doctor.id
       }
     }
-      return dynamodb.get(params).promise();
+    return dynamodb.get(params).promise();
   }).then(results => {
     if (results.Item) {
       response = {
-        statusCode: 400, 
+        statusCode: 400,
         body: 'User already exists in the database'
       };
 
@@ -57,7 +57,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 
