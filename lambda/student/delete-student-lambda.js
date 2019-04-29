@@ -2,23 +2,23 @@ const AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
   let response;
-  const studentEmail = event.email;
-  if (!studentEmail) {
+  const studentId = event.id;
+  if (!studentId) {
     response = {
-      statusCode: 400, 
-      body: 'An email is required to delete a student profile'
+      statusCode: 400,
+      body: 'An ID is required to delete a student profile'
     }
     callback(JSON.stringify(response));
   }
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
   var params = {
     Key: {
-     'email': studentEmail,
-    }, 
+      'id': studentId,
+    },
     TableName: 'students'
-   };
+  };
 
   dynamodb.delete(params).promise().then(resp => {
     response = {
@@ -28,7 +28,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 
