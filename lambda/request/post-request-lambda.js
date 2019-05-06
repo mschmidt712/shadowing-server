@@ -8,8 +8,8 @@ exports.handler = (event, context, callback) => {
   let response;
   let request = event.request;
   const validatedInput = joi.validate(request, requestSchema.schema, {
-      stripUnknown: true
-    })
+    stripUnknown: true
+  })
     .then(value => {
       value.createdDate = new Date().toISOString();
       value.uuid = uuidv1();
@@ -18,23 +18,23 @@ exports.handler = (event, context, callback) => {
     })
     .catch(err => {
       response = {
-        statusCode: 400, 
+        statusCode: 400,
         body: err
       }
 
       callback(JSON.stringify(response));
     });
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
   let params;
   let validatedRequest;
 
   validatedInput.then(validatedResp => {
     validatedRequest = validatedResp;
     params = {
-      TableName : 'students',
+      TableName: 'students',
       Key: {
-        email: validatedRequest.student
+        id: validatedRequest.student
       }
     }
 
@@ -42,7 +42,7 @@ exports.handler = (event, context, callback) => {
   }).then(results => {
     if (!results.Item) {
       response = {
-        statusCode: 400, 
+        statusCode: 400,
         body: 'Student does not exist in the database'
       };
       callback(JSON.stringify(response));
@@ -51,14 +51,14 @@ exports.handler = (event, context, callback) => {
     params = {
       TableName: 'doctors',
       Key: {
-        email: validatedRequest.doctor
+        id: validatedRequest.doctor
       }
     };
     return dynamodb.get(params).promise();
   }).then(results => {
     if (!results.Item) {
       response = {
-        statusCode: 400, 
+        statusCode: 400,
         body: 'Doctor does not exist in the database'
       };
       callback(JSON.stringify(response));
@@ -78,7 +78,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 

@@ -13,16 +13,16 @@ exports.handler = (event, context, callback) => {
 
   // Query Filters
   if (event.student) {
-    filterExpression = [...filterExpression, 'student = :studentEmail'];
-    expressionAttributeValues[':studentEmail'] = event.student;
+    filterExpression = [...filterExpression, 'student = :studentId'];
+    expressionAttributeValues[':studentId'] = event.student;
     params = Object.assign({}, params, {
       FilterExpression: filterExpression.join(' AND '),
       ExpressionAttributeValues: expressionAttributeValues
     });
-  } 
+  }
   if (event.doctor) {
-    filterExpression = [...filterExpression, 'doctor = :doctorEmail'];
-    expressionAttributeValues[':doctorEmail'] = event.doctor;
+    filterExpression = [...filterExpression, 'doctor = :doctorId'];
+    expressionAttributeValues[':doctorId'] = event.doctor;
     params = Object.assign({}, params, {
       FilterExpression: filterExpression.join(' AND '),
       ExpressionAttributeValues: expressionAttributeValues
@@ -38,7 +38,7 @@ exports.handler = (event, context, callback) => {
     queryByDate = true;
   }
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
   // Database Scan
   dynamodb.scan(params).promise().then(data => {
@@ -63,7 +63,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
     callback(JSON.stringify(response));
@@ -83,7 +83,7 @@ function validateDates(startDate, endDate, callback) {
 
 function filterByDate(results, startDate, endDate) {
   return results.filter(result => {
-    if (moment(result.createdDate).isSameOrAfter(startDate) && moment(result.createdDate).isSameOrBefore(endDate) ) {
+    if (moment(result.createdDate).isSameOrAfter(startDate) && moment(result.createdDate).isSameOrBefore(endDate)) {
       return true;
     } else {
       return false;

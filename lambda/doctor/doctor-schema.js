@@ -2,7 +2,7 @@ const joi = require('joi');
 
 exports.schema = joi.object().keys({
   name: joi.string().min(3).max(30).required(),
-  degree: joi.string().min(2).max(2).required(),
+  degree: joi.string().min(2).max(4).required(),
   specialty: joi.string().required(),
   email: joi.string().email({ minDomainAtoms: 2 }).required(),
   id: joi.string().required(),
