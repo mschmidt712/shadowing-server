@@ -19,7 +19,8 @@ exports.schema = joi.object().keys({
   additionalComments: joi.string(),
   badgePhoto: joi.string().required(),
   approved: joi.boolean().required(),
-  requests: joi.array()
+  requests: joi.array(),
+  zipCode: joi.number().integer()
 });
 
 exports.event = {

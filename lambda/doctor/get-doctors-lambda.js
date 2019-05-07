@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const zipcodes = require('zipcodes');
+const distance = require('google-distance-matrix');
 const formatZipCodes = require('./formatZipCodes').formatZipCodes;
 
 exports.handler = (event, context, callback) => {
@@ -41,8 +42,6 @@ exports.handler = (event, context, callback) => {
     items = dynamodb.scan(params).promise().then(data => data.Items);
   } else if (zipCodeQuery && distanceQuery) {
     const zipCodes = formatZipCodes(zipcodes.radius(zipCodeQuery, distanceQuery));
-    console.log('Zip Codes: ', zipCodes);
-
     params = Object.assign(params, {
       ScanFilter: {
         'zipCode': {
@@ -76,12 +75,36 @@ exports.handler = (event, context, callback) => {
 
       callback(JSON.stringify(response));
     }
-    response = {
-      statusCode: 200,
-      body: JSON.stringify(data)
-    };
 
-    callback(null, response);
+    const destinations = data.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
+    const origins = [zipCodeQuery];
+    distance.key('AIzaSyBV0ERwNWnf4cLICe7TozgRJG6jNM5aL9Q');
+    distance.mode('driving');
+
+    distance.matrix(origins, destinations, function (err, distances) {
+      if (err) {
+        response = {
+          statusCode: 500,
+          body: 'Error calculating distances to doctors.'
+        };
+
+        callback(JSON.stringify(response));
+      }
+      if (distances.status == 'OK') {
+        const distanceValues = distances.rows[0].elements.map(el => el);
+        const doctors = data.map((doctor, index) => {
+          return Object.assign({}, doctor, {
+            distance: distanceValues[index]
+          });
+        });
+
+        response = {
+          statusCode: 200,
+          body: JSON.stringify(doctors)
+        };
+        callback(null, response);
+      }
+    });
   }).catch(err => {
     response = {
       statusCode: 500,
