@@ -11,23 +11,23 @@ exports.handler = (event, context, callback) => {
   } else {
     approvedQuery = undefined;
   }
-  const zipCodeQuery = event.zipCode !== '' ? event.zipCode : undefined;
-  const distanceQuery = event.distance !== '' ? event.distance : undefined;
+  const zipCodeQuery = event.zipCode !== '' ? Number(event.zipCode) : undefined;
+  const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
 
   if (zipCodeQuery && !distanceQuery || distanceQuery && !zipCodeQuery) {
     response = {
-      statusCode: 400, 
+      statusCode: 400,
       body: 'Both a zip code and distance radius is required to locate doctors by area.'
     };
 
     callback(JSON.stringify(response));
   }
 
-  const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
+  const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
 
   let params = {
-    TableName: "doctors"
-   };
+    TableName: 'doctors'
+  };
   let items = [];
 
   if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {
@@ -40,18 +40,22 @@ exports.handler = (event, context, callback) => {
 
     items = dynamodb.scan(params).promise().then(data => data.Items);
   } else if (zipCodeQuery && distanceQuery) {
-    const zipCodes = zipcodes.radius(zipCodeQuery, distanceQuery);
+    const zipCodes = formatZipCodes(zipcodes.radius(zipCodeQuery, distanceQuery));
+    console.log('Zip Codes: ', zipCodes);
+
     params = Object.assign(params, {
-      ScanFilter : {
-        zipCode: {
+      ScanFilter: {
+        'zipCode': {
           ComparisonOperator: 'IN',
-          AttributeValueList: formatZipCodes(zipCodes)
+          AttributeValueList: zipCodes
         }
       }
     });
 
-    items = dynamodb.scan(params).promise().then(data => data.Items);
-    
+    items = dynamodb.scan(params).promise().then(data => {
+      return data.Items;
+    });
+
     if (approvedQuery !== undefined) {
       items = items.then(itemsArray => {
         return itemsArray.filter(obj => {
@@ -80,7 +84,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 
