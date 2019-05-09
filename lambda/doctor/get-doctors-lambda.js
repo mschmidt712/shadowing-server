@@ -14,6 +14,7 @@ exports.handler = (event, context, callback) => {
   }
   const zipCodeQuery = event.zipCode !== '' ? Number(event.zipCode) : undefined;
   const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
+  const specialtyQuery = event.specialty;
 
   if (zipCodeQuery && !distanceQuery || distanceQuery && !zipCodeQuery) {
     response = {
@@ -50,6 +51,16 @@ exports.handler = (event, context, callback) => {
         }
       }
     });
+
+    if (specialtyQuery) {
+      paramsScanFilter = Object.assign(params.ScanFilter, {
+        'specialty': {
+          ComparisonOperator: 'EQ',
+          AttributeValueList: [specialtyQuery]
+        }
+      });
+      params.ScanFilter = paramsScanFilter;
+    }
 
     items = dynamodb.scan(params).promise().then(data => {
       return data.Items;
