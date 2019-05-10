@@ -15,6 +15,7 @@ exports.handler = (event, context, callback) => {
   const zipCodeQuery = event.zipCode !== '' ? Number(event.zipCode) : undefined;
   const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
   const specialtyQuery = event.specialty;
+  const availabilityQuery = event.availability ? JSON.parse(decodeURIComponent(event.availability)) : undefined;
 
   if (zipCodeQuery && !distanceQuery || distanceQuery && !zipCodeQuery) {
     response = {
@@ -72,6 +73,20 @@ exports.handler = (event, context, callback) => {
           return obj.approved == approvedQuery;
         });
       })
+    }
+    if (availabilityQuery && Object.keys(availabilityQuery).length > 0) {
+      const requestedDays = Object.keys(availabilityQuery);
+      items = items.then(itemsArray => {
+        return itemsArray.filter(doctor => {
+          return requestedDays.reduce((bool, day) => {
+            if (doctor.scheduling[day] || bool) {
+              bool = true;
+              return bool;
+            }
+            return false;
+          }, false);
+        });
+      });
     }
   } else {
     items = dynamodb.scan(params).promise().then(data => data.Items);
