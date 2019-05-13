@@ -11,7 +11,7 @@ exports.schema = joi.object().keys({
         streetAddress: joi.string(),
         city: joi.string(),
         state: joi.string().uppercase().length(2),
-        zipCode: joi.number().integer().required()
+        zipCode: joi.number().integer().min(00501).max(99950).required()
     }),
     requests: joi.array()
 });

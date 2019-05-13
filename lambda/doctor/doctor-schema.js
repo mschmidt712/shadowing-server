@@ -11,16 +11,16 @@ exports.schema = joi.object().keys({
     streetAddress: joi.string(),
     city: joi.string(),
     state: joi.string().uppercase().length(2),
-    zipCode: joi.number().integer().required()
+    zipCode: joi.number().integer().min(00501).max(99950).required()
   }),
   scheduling: joi.object().required(),
   shiftLength: joi.array().length(2).required(),
   maxRequests: joi.number().integer().min(1),
   additionalComments: joi.string(),
   badgePhoto: joi.string().required(),
-  approved: joi.boolean().required(),
+  approved: joi.boolean(),
   requests: joi.array(),
-  zipCode: joi.number().integer()
+  zipCode: joi.number().integer().min(00501).max(99950)
 });
 
 exports.event = {

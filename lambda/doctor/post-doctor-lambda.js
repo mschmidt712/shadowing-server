@@ -26,7 +26,8 @@ exports.handler = (event, context, callback) => {
 
   validatedInput.then(validatedDoctor => {
     doctor = Object.assign({}, validatedDoctor, {
-      zipCode: validatedDoctor.address.zipCode
+      zipCode: validatedDoctor.address.zipCode,
+      approved: false
     });
     params = {
       TableName: 'doctors',
