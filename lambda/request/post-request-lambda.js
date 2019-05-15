@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
     .catch(err => {
       response = {
         statusCode: 400,
-        body: err
+        body: `${err.name}: ${err.details[0].message}`
       }
 
       callback(JSON.stringify(response));

@@ -4,6 +4,9 @@ exports.schema = joi.object().keys({
   student: joi.string().required(),
   doctor: joi.string().required(),
   scheduling: joi.object().required(),
+  createdDate: joi.string().isoDate(),
+  uuid: joi.string().uuid(),
+  ttl: joi.number().integer()
 });
 
 exports.event = {
