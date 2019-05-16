@@ -7,7 +7,7 @@ exports.handler = (event, context, callback) => {
   if (!studentId) {
     response = {
       statusCode: 400,
-      body: JSON.stringify('An ID is required to fetch a student profile')
+      body: 'An ID is required to fetch a student profile'
     }
     callback(response);
   }
@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500,
-      body: err
+      body: `Internal Server Error: ${err.message}`
     };
 
     callback(JSON.stringify(response));
