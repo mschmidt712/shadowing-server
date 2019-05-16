@@ -30,7 +30,7 @@ exports.handler = (event, context, callback) => {
   }).catch(err => {
     response = {
       statusCode: 500,
-      body: `Internal Service Error: ${err.message}`
+      body: `Internal Server Error: ${err.message}`
     };
 
     callback(JSON.stringify(response));
