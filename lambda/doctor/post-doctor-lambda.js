@@ -1,25 +1,32 @@
 const AWS = require('aws-sdk');
 const joi = require('joi');
 const doctorSchema = require('./doctor-schema.js');
+const validateUserAddress = require('./validateUserAddress').validateUserAddress;
 
 exports.handler = (event, context, callback) => {
   let response;
   let doctor = event.doctor;
   const validatedInput = joi.validate(doctor, doctorSchema.schema, {
     stripUnknown: true
-  })
-    .then(value => {
-      value.createdDate = new Date().toISOString();
-      return value;
-    })
-    .catch(err => {
+  }).then(value => {
+    value.createdDate = new Date().toISOString();
+    return value;
+  }).then(value => {
+    return validateUserAddress(value);
+  }).catch(err => {
+    if (err.isJoi) {
       response = {
         statusCode: 400,
         body: `${err.name}: ${err.details[0].message}`
       }
-
-      callback(JSON.stringify(response));
-    });
+    } else {
+      response = {
+        statusCode: 400,
+        body: err.message
+      }
+    }
+    callback(JSON.stringify(response));
+  });
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
   let params;
