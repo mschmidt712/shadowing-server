@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
     }
     return dynamodb.get(params).promise();
   }).then(results => {
-    if (!results) {
+    if (!results || Object.keys(results).length === 0) {
       response = {
         statusCode: 400,
         body: 'User does not exist in the database'
