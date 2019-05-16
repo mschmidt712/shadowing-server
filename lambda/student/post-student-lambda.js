@@ -1,23 +1,29 @@
 const AWS = require('aws-sdk');
 const joi = require('joi');
 const studentSchema = require('./student-schema.js');
+const validateUserAddress = require('./validateUserAddress').validateUserAddress;
 
 exports.handler = (event, context, callback) => {
   let response;
   let student = event.student;
   const validatedInput = joi.validate(student, studentSchema.schema, {
     stripUnknown: true
-  })
-    .then(value => {
-      value.createdDate = new Date().toISOString();
-      return value;
-    })
+  }).then(value => {
+    value.createdDate = new Date().toISOString();
+    return value;
+  }).then(value => validateUserAddress(value))
     .catch(err => {
-      response = {
-        statusCode: 400,
-        body: `${err.name}: ${err.details[0].message}`
+      if (err.isJoi) {
+        response = {
+          statusCode: 400,
+          body: `${err.name}: ${err.details[0].message}`
+        }
+      } else {
+        response = {
+          statusCode: 400,
+          body: err.message
+        }
       }
-
       callback(JSON.stringify(response));
     });
 
