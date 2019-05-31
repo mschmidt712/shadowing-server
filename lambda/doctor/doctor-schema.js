@@ -17,7 +17,7 @@ exports.schema = joi.object().keys({
   shiftLength: joi.array().length(2).required(),
   maxRequests: joi.number().integer().min(1),
   additionalComments: joi.string(),
-  badgePhoto: joi.string().required(),
+  badgePhoto: joi.string(),
   approved: joi.boolean(),
   requests: joi.array(),
   zipCode: joi.number().integer().min(00501).max(99950)
