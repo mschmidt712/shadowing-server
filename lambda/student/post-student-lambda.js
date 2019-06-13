@@ -80,7 +80,6 @@ exports.handler = (event, context, callback) => {
   });
 };
 
-
 exports.subscribeStudentEmail = function (email, name) {
   const api_key_name = 'ConvertKit_API_Key';
 
