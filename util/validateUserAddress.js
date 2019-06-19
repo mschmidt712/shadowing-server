@@ -7,7 +7,7 @@ exports.validateUserAddress = function validateUserAddress(obj) {
   const url = 'http://production.shippingapis.com/ShippingAPITest.dll?API=Verify&XML=' +
     '<AddressValidateRequest USERID="010MEDED7565"><Address ID="0"><Address1></Address1>' +
     '<Address2>' + address.streetAddress + '</Address2><City>' + address.city + '</City><State>' + address.state + '</State>' +
-    '<Zip5>' + address.zip + '</Zip5><Zip4></Zip4></Address></AddressValidateRequest>';
+    '<Zip5>' + address.zipCode + '</Zip5><Zip4></Zip4></Address></AddressValidateRequest>';
 
   return fetch(url, {
     method: "GET"
