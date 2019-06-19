@@ -33,7 +33,7 @@ exports.handler = (event, context, callback) => {
   }).then(results => {
     if (!results.Item) {
       response = {
-        statusCode: 400,
+        statusCode: 404,
         body: 'Request does not exist in the database'
       };
       callback(JSON.stringify(response));
