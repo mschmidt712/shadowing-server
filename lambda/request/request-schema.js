@@ -4,9 +4,10 @@ exports.schema = joi.object().keys({
   student: joi.string().required(),
   doctor: joi.string().required(),
   scheduling: joi.object().required(),
+  status: joi.string().valid(['approved', 'denied', 'pending']),
   createdDate: joi.string().isoDate(),
   uuid: joi.string().uuid(),
-  ttl: joi.number().integer()
+  ttl: joi.number().integer(),
 });
 
 exports.event = {
@@ -21,6 +22,7 @@ exports.event = {
       thursday: false,
       friday: false,
       saturday: false
-    }
+    },
+    status: 'pending'
   }
 }
