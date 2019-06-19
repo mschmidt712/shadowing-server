@@ -12,7 +12,7 @@ exports.handler = (event, context, callback) => {
   } else {
     approvedQuery = undefined;
   }
-  const zipCodeQuery = event.zipCode !== '' ? Number(event.zipCode) : undefined;
+  const zipCodeQuery = event.zipCode !== '' ? event.zipCode : undefined;
   const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
   const specialtyQuery = event.specialty;
   const availabilityQuery = event.availability ? JSON.parse(decodeURIComponent(event.availability)) : undefined;

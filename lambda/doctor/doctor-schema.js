@@ -11,7 +11,7 @@ exports.schema = joi.object().keys({
     streetAddress: joi.string(),
     city: joi.string(),
     state: joi.string().uppercase().length(2),
-    zipCode: joi.number().integer().min(00501).max(99950).required()
+    zipCode: joi.string().min(5).max(5).required()
   }),
   scheduling: joi.object().required(),
   shiftLength: joi.array().length(2).required(),
@@ -20,7 +20,7 @@ exports.schema = joi.object().keys({
   badgePhoto: joi.string(),
   approved: joi.boolean(),
   requests: joi.array(),
-  zipCode: joi.number().integer().min(00501).max(99950)
+  zipCode: joi.string().min(5).max(5)
 });
 
 exports.event = {
