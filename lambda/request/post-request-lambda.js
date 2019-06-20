@@ -51,16 +51,15 @@ exports.handler = (event, context, callback) => {
         body: `Student requested shadowing with this doctor on ${requestDate} and is not able to request shadowing again until ${ttl}`
       };
       callback(JSON.stringify(response));
-    }
-
-    params = {
-      TableName: 'students',
-      Key: {
-        id: validatedRequest.student
+    } else {
+      params = {
+        TableName: 'students',
+        Key: {
+          id: validatedRequest.student
+        }
       }
+      return dynamodb.get(params).promise();
     }
-
-    return dynamodb.get(params).promise();
   }).then(results => {
     if (!results.Item) {
       response = {
@@ -68,15 +67,15 @@ exports.handler = (event, context, callback) => {
         body: 'Student does not exist in the database'
       };
       callback(JSON.stringify(response));
+    } else {
+      params = {
+        TableName: 'doctors',
+        Key: {
+          id: validatedRequest.doctor
+        }
+      };
+      return dynamodb.get(params).promise();
     }
-
-    params = {
-      TableName: 'doctors',
-      Key: {
-        id: validatedRequest.doctor
-      }
-    };
-    return dynamodb.get(params).promise();
   }).then(results => {
     if (!results.Item) {
       response = {
@@ -84,13 +83,13 @@ exports.handler = (event, context, callback) => {
         body: 'Doctor does not exist in the database'
       };
       callback(JSON.stringify(response));
+    } else {
+      params = {
+        TableName: 'requests',
+        Item: validatedRequest
+      };
+      return dynamodb.put(params).promise();
     }
-
-    params = {
-      TableName: 'requests',
-      Item: validatedRequest
-    };
-    return dynamodb.put(params).promise();
   }).then(() => {
     response = {
       statusCode: 201,
