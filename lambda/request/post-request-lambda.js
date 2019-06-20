@@ -33,6 +33,27 @@ exports.handler = (event, context, callback) => {
   validatedInput.then(validatedResp => {
     validatedRequest = validatedResp;
     params = {
+      TableName: 'requests',
+      FilterExpression: 'student = :studentId and doctor = :doctorId',
+      ExpressionAttributeValues: {
+        ':studentId': validatedRequest.student,
+        ':doctorId': validatedRequest.doctor
+      },
+    }
+
+    return dynamodb.scan(params).promise();
+  }).then(results => {
+    if (results.Items) {
+      const requestDate = moment(results.Items[0].createdDate).format('l');
+      const ttl = moment(results.Items[0].createdDate).add(60, 'days').format('l');
+      response = {
+        statusCode: 400,
+        body: `Student requested shadowing with this doctor on ${requestDate} and is not able to request shadowing again until ${ttl}`
+      };
+      callback(JSON.stringify(response));
+    }
+
+    params = {
       TableName: 'students',
       Key: {
         id: validatedRequest.student
