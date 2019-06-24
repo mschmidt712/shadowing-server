@@ -49,16 +49,17 @@ exports.handler = (event, context, callback) => {
       callback(JSON.stringify(response));
     }
 
+    const updatedDoctor = Object.assign({}, results.Item, doctor);
     params = {
       TableName: 'doctors',
-      Item: doctor,
+      Item: updatedDoctor,
       ReturnValues: 'ALL_OLD'
     };
     return dynamodb.put(params).promise();
   }).then(resp => {
     response = {
       statusCode: 200,
-      body: JSON.stringify(doctor)
+      body: JSON.stringify(updatedDoctor)
     };
 
     callback(null, response);

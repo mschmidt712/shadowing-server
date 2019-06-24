@@ -49,6 +49,7 @@ exports.handler = (event, context, callback) => {
       callback(JSON.stringify(response));
     }
 
+    student = Object.assign({}, results.Item, student);
     params = {
       TableName: 'students',
       Item: student,
