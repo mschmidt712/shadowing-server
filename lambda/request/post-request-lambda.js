@@ -43,13 +43,14 @@ exports.handler = (event, context, callback) => {
 
     return dynamodb.scan(params).promise();
   }).then(results => {
-    if (results.Items) {
+    if (results.Items.length !== 0) {
       const requestDate = moment(results.Items[0].createdDate).format('l');
       const ttl = moment(results.Items[0].createdDate).add(60, 'days').format('l');
       response = {
         statusCode: 400,
         body: `Student requested shadowing with this doctor on ${requestDate} and is not able to request shadowing again until ${ttl}`
       };
+
       callback(JSON.stringify(response));
     } else {
       params = {
