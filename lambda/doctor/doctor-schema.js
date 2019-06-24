@@ -16,6 +16,7 @@ exports.schema = joi.object().keys({
   scheduling: joi.object().required(),
   shiftLength: joi.array().length(2).required(),
   maxRequests: joi.number().integer().min(1),
+  weeklyRequests: joi.number().integer(),
   additionalComments: joi.string(),
   badgePhoto: joi.string(),
   approved: joi.boolean(),

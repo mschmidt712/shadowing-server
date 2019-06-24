@@ -33,7 +33,8 @@ exports.handler = (event, context, callback) => {
   };
   let items = [];
 
-  if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {
+
+  if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {   // Get All Approved Doctors
     params = Object.assign(params, {
       FilterExpression: 'approved = :approved_bool',
       ExpressionAttributeValues: {
@@ -42,7 +43,7 @@ exports.handler = (event, context, callback) => {
     });
 
     items = dynamodb.scan(params).promise().then(data => data.Items);
-  } else if (zipCodeQuery && distanceQuery) {
+  } else if (zipCodeQuery && distanceQuery) { // Get Doctors by Zip Code and Radius
     const zipCodes = formatZipCodes(zipcodes.radius(zipCodeQuery, distanceQuery));
     params = Object.assign(params, {
       ScanFilter: {
@@ -53,7 +54,7 @@ exports.handler = (event, context, callback) => {
       }
     });
 
-    if (specialtyQuery) {
+    if (specialtyQuery) { // Get Doctors by Zip Code and Radius - Filter by Specialty
       paramsScanFilter = Object.assign(params.ScanFilter, {
         'specialty': {
           ComparisonOperator: 'EQ',
@@ -67,14 +68,14 @@ exports.handler = (event, context, callback) => {
       return data.Items;
     });
 
-    if (approvedQuery !== undefined) {
+    if (approvedQuery !== undefined) { // Get Doctors by Zip Code and Radius - Filter by Approved
       items = items.then(itemsArray => {
         return itemsArray.filter(obj => {
           return obj.approved == approvedQuery;
         });
       })
     }
-    if (availabilityQuery && Object.keys(availabilityQuery).length > 0) {
+    if (availabilityQuery && Object.keys(availabilityQuery).length > 0) { // Get Doctors by Zip Code and Radius - Filter by Availability
       const requestedDays = Object.keys(availabilityQuery);
       items = items.then(itemsArray => {
         return itemsArray.filter(doctor => {
@@ -88,7 +89,7 @@ exports.handler = (event, context, callback) => {
         });
       });
     }
-  } else {
+  } else { // Get All Doctors
     items = dynamodb.scan(params).promise().then(data => data.Items);
   }
 
@@ -102,7 +103,12 @@ exports.handler = (event, context, callback) => {
       callback(JSON.stringify(response));
     }
 
-    const destinations = data.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
+    const availableDoctors = data.filter(doctor => { // Remove Doctors Who Have Reached Their Max Weekly Requests
+      return doctor.weeklyRequests < doctor.maxRequests;
+    })
+
+    // Add Distance Parameter Between Student and Doctors
+    const destinations = availableDoctors.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
     const origins = [zipCodeQuery];
     distance.key('AIzaSyBV0ERwNWnf4cLICe7TozgRJG6jNM5aL9Q');
     distance.mode('driving');
@@ -118,7 +124,7 @@ exports.handler = (event, context, callback) => {
       }
       if (distances.status == 'OK') {
         const distanceValues = distances.rows[0].elements.map(el => el);
-        const doctors = data.map((doctor, index) => {
+        const doctorsWithLocation = availableDoctors.map((doctor, index) => {
           return Object.assign({}, doctor, {
             distance: distanceValues[index]
           });
@@ -126,9 +132,15 @@ exports.handler = (event, context, callback) => {
 
         response = {
           statusCode: 200,
-          body: JSON.stringify(doctors)
+          body: JSON.stringify(doctorsWithLocation)
         };
         callback(null, response);
+      } else {
+        response = {
+          statusCode: 500,
+          body: 'Error calculating distances to doctors.'
+        };
+        callback(response);
       }
     });
   }).catch(err => {

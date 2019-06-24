@@ -10,6 +10,7 @@ exports.handler = (event, context, callback) => {
     stripUnknown: true
   }).then(value => {
     value.createdDate = new Date().toISOString();
+    value.weeklyRequests = 0;
     return value;
   }).then(value => {
     return validateUserAddress(value);

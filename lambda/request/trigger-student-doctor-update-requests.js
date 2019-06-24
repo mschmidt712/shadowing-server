@@ -35,13 +35,15 @@ exports.handler = (event, context, callback) => {
           id: doctor
         },
         ReturnValues: 'ALL_NEW',
-        UpdateExpression: 'SET #requests = list_append(if_not_exists(#requests, :empty_list), :requestUuid)',
+        UpdateExpression: 'SET #requests = list_append(if_not_exists(#requests, :empty_list), :requestUuid), #weeklyRequests =  #weeklyRequests + :val',
         ExpressionAttributeNames: {
-          '#requests': 'requests'
+          '#requests': 'requests',
+          '#weeklyRequests': 'weeklyRequests'
         },
         ExpressionAttributeValues: {
           ':empty_list': [],
-          ':requestUuid': [requestUuid]
+          ':requestUuid': [requestUuid],
+          ':val': 1
         }
       };
 
