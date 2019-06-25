@@ -1,6 +1,7 @@
 const joi = require('joi');
 
 exports.schema = joi.object().keys({
+  additionalInfo: joi.string().max(150),
   student: joi.string().required(),
   doctor: joi.string().required(),
   scheduling: joi.object().required(),
