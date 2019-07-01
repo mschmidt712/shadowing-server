@@ -105,44 +105,52 @@ exports.handler = (event, context, callback) => {
 
     const availableDoctors = data.filter(doctor => { // Remove Doctors Who Have Reached Their Max Weekly Requests
       return doctor.weeklyRequests < doctor.maxRequests;
-    })
-
-    // Add Distance Parameter Between Student and Doctors
-    const destinations = availableDoctors.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
-    const origins = [zipCodeQuery];
-    distance.key('AIzaSyBV0ERwNWnf4cLICe7TozgRJG6jNM5aL9Q');
-    distance.mode('driving');
-
-    distance.matrix(origins, destinations, function (err, distances) {
-      if (err) {
-        response = {
-          statusCode: 500,
-          body: 'Error calculating distances to doctors.'
-        };
-
-        callback(JSON.stringify(response));
-      }
-      if (distances.status == 'OK') {
-        const distanceValues = distances.rows[0].elements.map(el => el);
-        const doctorsWithLocation = availableDoctors.map((doctor, index) => {
-          return Object.assign({}, doctor, {
-            distance: distanceValues[index]
-          });
-        });
-
-        response = {
-          statusCode: 200,
-          body: JSON.stringify(doctorsWithLocation)
-        };
-        callback(null, response);
-      } else {
-        response = {
-          statusCode: 500,
-          body: 'Error calculating distances to doctors.'
-        };
-        callback(response);
-      }
     });
+
+    if (zipCodeQuery) {
+      // Add Distance Parameter Between Student and Doctors
+      const destinations = availableDoctors.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
+      const origins = [zipCodeQuery];
+      distance.key('AIzaSyBV0ERwNWnf4cLICe7TozgRJG6jNM5aL9Q');
+      distance.mode('driving');
+
+      distance.matrix(origins, destinations, function (err, distances) {
+        if (err) {
+          response = {
+            statusCode: 500,
+            body: 'Error calculating distances to doctors.'
+          };
+
+          callback(JSON.stringify(response));
+        }
+        if (distances.status == 'OK') {
+          const distanceValues = distances.rows[0].elements.map(el => el);
+          const doctorsWithLocation = availableDoctors.map((doctor, index) => {
+            return Object.assign({}, doctor, {
+              distance: distanceValues[index]
+            });
+          });
+
+          response = {
+            statusCode: 200,
+            body: JSON.stringify(doctorsWithLocation)
+          };
+          callback(null, response);
+        } else {
+          response = {
+            statusCode: 500,
+            body: 'Error calculating distances to doctors.'
+          };
+          callback(response);
+        }
+      });
+    } else {
+      response = {
+        statusCode: 200,
+        body: JSON.stringify(data)
+      };
+      callback(null, response);
+    }
   }).catch(err => {
     response = {
       statusCode: 500,
