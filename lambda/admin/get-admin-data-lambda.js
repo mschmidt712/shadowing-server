@@ -3,11 +3,11 @@ const AWS = require('aws-sdk');
 exports.handler = (event, context, callback) => {
   const dynamodb = new AWS.DynamoDB.DocumentClient({region: 'us-east-1'});
 
-  let reponse;
+  let response;
   const params = {
-    TableName: "Admin",
+    TableName: 'admin',
     Key: {
-        'id': 1
+      'id': 'ddf14b27-5950-4f49-a1b3-f0d94a0679ca'
     }
    };
 
@@ -20,7 +20,7 @@ exports.handler = (event, context, callback) => {
     callback(null, response);
   }).catch(err => {
     response = {
-      statusCode: 500, 
+      statusCode: 500,
       body: err
     };
 
