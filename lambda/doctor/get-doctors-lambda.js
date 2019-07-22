@@ -103,10 +103,6 @@ exports.handler = (event, context, callback) => {
       callback(JSON.stringify(response));
     }
 
-    // const availableDoctors = data.filter(doctor => { // Remove Doctors Who Have Reached Their Max Weekly Requests
-    //   return doctor.weeklyRequests < doctor.maxRequests;
-    // });
-
     if (zipCodeQuery) {
       // Add Distance Parameter Between Student and Doctors
       const destinations = data.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
