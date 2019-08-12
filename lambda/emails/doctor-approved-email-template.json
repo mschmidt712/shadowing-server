@@ -1,0 +1,7 @@
+{
+  "Template": {
+    "TemplateName": "doctor-approved-email-template",
+    "SubjectPart": "Account Approved on FindShadowing.com",
+    "HtmlPart": "<h1>Congratulations, Your account has been approved!</h1><h3>Here is a little information about what to expect.</h3><p>You will now begin to receive requests for shadowing through <a href='http://findshadowing.com'>FindShadowing.com</a>. When a new request is made, you will be notified via email and can approve or deny the request from your requests inbox. You can find the requests inbox by clicking the envelope button in the top right header bar, next to your profile button.</p><p>Incoming requests will be limited based on your available days, hours, and maximum requests per week. You can change these preferences at any time through your profile.</p><p>Thank you for assisting us in helping future generations of physicians! Feel free to contact us with any issues, concerns or questions.</p><br><h4> Ryan Gray, M.D. </h4><p> Find All My Podcasts at <a href='https://medicalschoolhq.net/meded-media/'>Meded Media</a></p>"
+  }
+}
