@@ -13,7 +13,7 @@ exports.handler = (event, context, callback) => {
     .then(value => {
       value.createdDate = new Date().toISOString();
       value.uuid = uuidv1();
-      value.ttl = moment().add(60, 'days').toDate().getTime();
+      value.ttl = moment().add(60, 'days').unix();
       value.status = 'pending';
       return value;
     })
@@ -29,6 +29,7 @@ exports.handler = (event, context, callback) => {
   const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
   let params;
   let validatedRequest;
+  let student, doctor;
 
   validatedInput.then(validatedResp => {
     validatedRequest = validatedResp;
@@ -69,6 +70,8 @@ exports.handler = (event, context, callback) => {
       };
       callback(JSON.stringify(response));
     } else {
+      student = results.Item;
+
       params = {
         TableName: 'doctors',
         Key: {
@@ -85,6 +88,8 @@ exports.handler = (event, context, callback) => {
       };
       callback(JSON.stringify(response));
     } else {
+      doctor = results.Item;
+
       params = {
         TableName: 'requests',
         Item: validatedRequest
@@ -92,6 +97,42 @@ exports.handler = (event, context, callback) => {
       return dynamodb.put(params).promise();
     }
   }).then(() => {
+    const availability = Object.keys(request.scheduling).filter(day => {
+      if (!request.scheduling[day]) {
+        return false;
+      }
+      return true;
+    }).reduce((str, day) => {
+      if (str.length > 0) {
+        str += ' & ';
+      }
+      str += `${this.capitalizeWord(day)} from ${this.formatTime(request.scheduling[day][0])} to ${this.formatTime(request.scheduling[day][1])}`
+      return str;
+    }, '');
+
+    var newRequestEmailParams = {
+      FunctionName: 'new-request-email-lambda',
+      InvocationType: 'Event',
+      Payload: JSON.stringify({
+        "email": doctor.email,
+        "requestData": {
+          "name": doctor.name,
+          "availability": availability,
+          "student": student.name
+        }
+      })
+    };
+    const Lambda = new AWS.Lambda({ region: 'us-east-1' });
+    return new Promise((resolve, reject) => {
+      return Lambda.invoke(newRequestEmailParams, function (err, data) {
+        if (err) {
+          resolve(`Request created but request notification email failed: ${err}`);
+        } else resolve('Request notification email sent.');
+      });
+    });
+  }).then((newRequestEmailResp) => {
+    console.log(newRequestEmailResp);
+
     response = {
       statusCode: 201,
       body: JSON.stringify(`Request between ${validatedRequest.student} and ${validatedRequest.doctor} successfully created.`)
@@ -107,3 +148,12 @@ exports.handler = (event, context, callback) => {
     callback(JSON.stringify(response));
   });
 };
+
+exports.capitalizeWord = function (str) {
+  const firstLetter = str.charAt(0).toUpperCase();
+  return `${firstLetter}${str.slice(1)}`;
+}
+
+exports.formatTime = function (time) {
+  return moment(time, 'HH:mm:ss').format('h:mm A');
+}
