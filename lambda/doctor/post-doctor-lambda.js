@@ -60,6 +60,26 @@ exports.handler = (event, context, callback) => {
     };
     return dynamodb.put(params).promise();
   }).then(() => {
+    var welcomeEmailParams = {
+      FunctionName: 'send-email',
+      InvocationType: 'Event',
+      Payload: JSON.stringify({
+        "email": doctor.email,
+        "name": doctor.name,
+        "occupation": "doctor"
+      })
+    };
+    const Lambda = new AWS.Lambda({ region: 'us-east-1' });
+    return new Promise((resolve, reject) => {
+      return Lambda.invoke(welcomeEmailParams, function (err, data) {
+        if (err) {
+          resolve(`Account created but welcome email failed: ${err}`);
+        } else resolve('Welcome email sent.');
+      });
+    });
+  }).then((welcomeEmailResp) => {
+    console.log(welcomeEmailResp);
+
     response = {
       statusCode: 201,
       body: JSON.stringify(`User ${doctor.email} successfully created.`)
