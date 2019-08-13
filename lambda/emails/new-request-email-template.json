@@ -1,7 +1,0 @@
-{
-  "Template": {
-    "TemplateName": "new-request-email-template",
-    "SubjectPart": "New Shadowing Request!",
-    "HtmlPart": "<h1>You Have a New Shadowing Request!</h1><p>Hi Dr. {{name}},</p><p>You have a new request for shadowing on {{availability}} from {{student}}.</p><p>Please go to <a href='findshadowing.com'>FindShadowing.com</a> to accept or deny this request.</p><p>Thank you again for your help educating the next generation of physicians.</p><br><h4>Ryan Gray, M.D.</h4><p>Find All My Podcasts at <a href='https://medicalschoolhq.net/meded-media/'>Meded Media</a></p>"
-  }
-}

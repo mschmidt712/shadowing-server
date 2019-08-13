@@ -1,7 +1,0 @@
-{
-  "Template": {
-    "TemplateName": "doctor-welcome-email-template",
-    "SubjectPart": "Welcome to FindShadowing.com!",
-    "HtmlPart": "<h1>{{name}}, Welcome to <a href='findshadowing.com'>FindShadowing.com</a></h1><h3>Thanks for Signing Up!</h3><p> We are honored to have your assistance in student shadowing and are looking forward to connecting you with students. We are here to simplify the process of connecting physicians and students based on location and availability, but we leave the rest of the shadowing process up to you!</p><p>Your badge photo and account will be manually verified in 3-5 business days and then you will start receiving shadowing requests.</p><p>Thank you for assisting us in helping future generations of physicians! Feel free to contact us with any issues, concerns or questions. </p><br><h4> Ryan Gray, M.D. </h4><p> Find All My Podcasts at <a href='https://medicalschoolhq.net/meded-media/'>Meded Media</a></p>"
-  }
-}
