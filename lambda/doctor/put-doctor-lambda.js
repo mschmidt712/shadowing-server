@@ -26,6 +26,7 @@ exports.handler = (event, context, callback) => {
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
   let params;
+  let approvalChange = false;
 
   validatedInput.then(validatedDoctor => {
     doctor = Object.assign({}, validatedDoctor, {
@@ -48,6 +49,9 @@ exports.handler = (event, context, callback) => {
 
       callback(JSON.stringify(response));
     }
+    if (!results.Item.approved && doctor.approved) {
+      approvalChange = true;
+    }
 
     doctor = Object.assign({}, results.Item, doctor);
     params = {
@@ -56,7 +60,15 @@ exports.handler = (event, context, callback) => {
       ReturnValues: 'ALL_OLD'
     };
     return dynamodb.put(params).promise();
-  }).then(resp => {
+  }).then(() => {
+    if (approvalChange) {
+      return this.sendApprovalNotificationEmail(doctor);
+    } else {
+      return new Promise(resolve => resolve('No approval change requested.'));
+    }
+  }).then((approvalEmailResp) => {
+    console.log(approvalEmailResp);
+
     response = {
       statusCode: 200,
       body: JSON.stringify(doctor)
@@ -72,3 +84,22 @@ exports.handler = (event, context, callback) => {
     callback(JSON.stringify(response));
   });
 };
+
+exports.sendApprovalNotificationEmail = doctor => {
+  var approvalEmailParams = {
+    FunctionName: 'doctor-approved-email-lambda',
+    InvocationType: 'Event',
+    Payload: JSON.stringify({
+      email: doctor.email
+    })
+  };
+
+  const Lambda = new AWS.Lambda({ region: 'us-east-1' });
+  return new Promise(resolve => {
+    return Lambda.invoke(approvalEmailParams, function (err, data) {
+      if (err) {
+        resolve(`Account approved but approval email failed: ${err}`);
+      } else resolve('Approval email sent.');
+    });
+  });
+}
