@@ -13,7 +13,8 @@ exports.schema = joi.object().keys({
     state: joi.string().uppercase().length(2),
     zipCode: joi.number().integer().min(00501).max(99950).required()
   }),
-  requests: joi.array()
+  requests: joi.array(),
+  cv: joi.string()
 });
 
 const student = {
