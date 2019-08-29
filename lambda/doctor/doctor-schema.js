@@ -20,6 +20,7 @@ exports.schema = joi.object().keys({
   additionalComments: joi.string(),
   badgePhoto: joi.string(),
   approved: joi.boolean(),
+  active: joi.boolean(),
   requests: joi.array(),
   zipCode: joi.string().min(5).max(5)
 });
