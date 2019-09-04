@@ -81,6 +81,22 @@ exports.handler = (event, context, callback) => {
   }).then((welcomeEmailResp) => {
     console.log(welcomeEmailResp);
 
+    var newPhysicianEmailParams = {
+      FunctionName: 'new-doctor-email-lambda',
+      InvocationType: 'Event',
+      Payload: "{}"
+    };
+    const Lambda = new AWS.Lambda({ region: 'us-east-1' });
+    return new Promise(resolve => {
+      return Lambda.invoke(newPhysicianEmailParams, function (err, data) {
+        if (err) {
+          resolve(`Account created but physician sign-up notification email failed: ${err}`);
+        } else resolve('Physician sign-up notification email sent.');
+      });
+    });
+  }).then((newPhysicianEmailResp) => {
+    console.log(newPhysicianEmailResp);
+
     response = {
       statusCode: 201,
       body: JSON.stringify(`User ${doctor.email} successfully created.`)
