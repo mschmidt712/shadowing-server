@@ -13,6 +13,8 @@ exports.schema = joi.object().keys({
     state: joi.string().uppercase().length(2),
     zipCode: joi.number().integer().min(00501).max(99950).required()
   }),
+  school: joi.string().required(),
+  schoolYear: joi.string().valid('high-school', 'freshmen', 'sophomore', 'junior', 'senior', 'masters', 'post-baccalaureate', 'graduated').required(),
   requests: joi.array(),
   cv: joi.string()
 });
@@ -25,6 +27,8 @@ const student = {
   "phoneNumber": "(925)519-6702",
   "hipaaCert": true,
   "subscribe": true,
+  "school": "MIT",
+  "schoolYear": "graduated",
   "address": {
     "streetAddress": "3038 Race Street",
     "city": "Denver",
