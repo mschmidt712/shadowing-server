@@ -22,6 +22,7 @@ exports.schema = joi.object().keys({
   approved: joi.boolean(),
   active: joi.boolean(),
   requests: joi.array(),
+  requestEmail: joi.string().email({ minDomainAtoms: 2 }),
   zipCode: joi.string().min(5).max(5)
 });
 

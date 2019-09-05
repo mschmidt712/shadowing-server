@@ -114,7 +114,7 @@ exports.handler = (event, context, callback) => {
       FunctionName: 'new-request-email-lambda',
       InvocationType: 'Event',
       Payload: JSON.stringify({
-        "email": doctor.email,
+        "email": doctor.requestEmail,
         "requestData": {
           "name": doctor.name,
           "availability": availability,
