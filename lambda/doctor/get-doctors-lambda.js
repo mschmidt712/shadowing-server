@@ -6,12 +6,20 @@ const formatZipCodes = require('./formatZipCodes').formatZipCodes;
 exports.handler = (event, context, callback) => {
   let response = {};
   let approvedQuery;
+  let activeQuery;
 
   if (event.approved == 'true' || event.approved == 'false' && event.approved !== '') {
     approvedQuery = event.approved === 'true' ? true : false;
   } else {
     approvedQuery = undefined;
   }
+
+  if (event.active == 'true' || event.active == 'false' && event.active !== '') {
+    activeQuery = event.active === 'true' ? true : false;
+  } else {
+    activeQuery = undefined;
+  }
+
   const zipCodeQuery = event.zipCode !== '' ? event.zipCode : undefined;
   const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
   const specialtyQuery = event.specialty;
@@ -132,9 +140,12 @@ exports.handler = (event, context, callback) => {
       return new Promise(resolve => resolve(data));
     }
   }).then(resp => {
-    const data = resp.filter(item => {
-      return item.active;
-    });
+    let data = resp;
+    if (activeQuery) {
+      data = resp.filter(item => {
+        return item.active === activeQuery;
+      });
+    }
     response = {
       statusCode: 200,
       body: JSON.stringify(data)
