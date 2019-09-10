@@ -53,6 +53,17 @@ exports.handler = (event, context, callback) => {
     items = dynamodb.scan(params).promise().then(data => data.Items);
   } else if (zipCodeQuery && distanceQuery) { // Get Doctors by Zip Code and Radius
     const zipCodes = formatZipCodes(zipcodes.radius(zipCodeQuery, distanceQuery));
+
+    console.log('Zip Codes: ', zipCodes);
+    if (zipCodes.length === 0) {
+      response = {
+        statusCode: 400,
+        body: 'No zip codes found matching your query. Please try your search again with a different zip code.'
+      }
+
+      callback(JSON.stringify(response));
+    }
+
     params = Object.assign(params, {
       ScanFilter: {
         'zipCode': {
