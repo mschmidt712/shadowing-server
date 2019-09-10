@@ -9,7 +9,7 @@ exports.handler = (event, context, callback) => {
       statusCode: 400,
       body: 'An ID is required to fetch a student profile'
     }
-    callback(response);
+    callback(JSON.stringify(response));
   }
 
   const dynamodb = new AWS.DynamoDB.DocumentClient({ region: 'us-east-1' });
