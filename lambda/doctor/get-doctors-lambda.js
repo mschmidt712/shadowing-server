@@ -20,6 +20,7 @@ exports.handler = (event, context, callback) => {
     activeQuery = undefined;
   }
 
+  const careerQuery = event.career !== '' ? event.career : undefined;
   const zipCodeQuery = event.zipCode !== '' ? event.zipCode : undefined;
   const distanceQuery = event.distance !== '' ? Number(event.distance) : undefined;
   const specialtyQuery = event.specialty;
@@ -28,7 +29,7 @@ exports.handler = (event, context, callback) => {
   if (zipCodeQuery && !distanceQuery || distanceQuery && !zipCodeQuery) {
     response = {
       statusCode: 400,
-      body: 'Both a zip code and distance radius is required to locate doctors by area.'
+      body: 'Both a zip code and distance radius is required to locate professionals by area.'
     };
 
     callback(JSON.stringify(response));
@@ -42,7 +43,7 @@ exports.handler = (event, context, callback) => {
   let items = [];
 
 
-  if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {   // Get All Approved Doctors
+  if (typeof approvedQuery === 'boolean' && !zipCodeQuery && !distanceQuery) {   // Get All Approved Professionals
     params = Object.assign(params, {
       FilterExpression: 'approved = :approved_bool',
       ExpressionAttributeValues: {
@@ -51,10 +52,9 @@ exports.handler = (event, context, callback) => {
     });
 
     items = dynamodb.scan(params).promise().then(data => data.Items);
-  } else if (zipCodeQuery && distanceQuery) { // Get Doctors by Zip Code and Radius
+  } else if (zipCodeQuery && distanceQuery) { // Get Career by Zip Code and Radius
     const zipCodes = formatZipCodes(zipcodes.radius(zipCodeQuery, distanceQuery));
 
-    console.log('Zip Codes: ', zipCodes);
     if (zipCodes.length === 0) {
       response = {
         statusCode: 400,
@@ -69,11 +69,15 @@ exports.handler = (event, context, callback) => {
         'zipCode': {
           ComparisonOperator: 'IN',
           AttributeValueList: zipCodes
+        },
+        'career': {
+          ComparisonOperator: 'EQ',
+          AttributeValueList: [careerQuery]
         }
       }
     });
 
-    if (specialtyQuery) { // Get Doctors by Zip Code and Radius - Filter by Specialty
+    if (specialtyQuery) { // Get Career by Zip Code and Radius - Filter by Specialty
       paramsScanFilter = Object.assign(params.ScanFilter, {
         'specialty': {
           ComparisonOperator: 'EQ',
@@ -87,19 +91,19 @@ exports.handler = (event, context, callback) => {
       return data.Items;
     });
 
-    if (approvedQuery !== undefined) { // Get Doctors by Zip Code and Radius - Filter by Approved
+    if (approvedQuery !== undefined) { // Get Career by Zip Code and Radius - Filter by Approved
       items = items.then(itemsArray => {
         return itemsArray.filter(obj => {
           return obj.approved == approvedQuery;
         });
       })
     }
-    if (availabilityQuery && Object.keys(availabilityQuery).length > 0) { // Get Doctors by Zip Code and Radius - Filter by Availability
+    if (availabilityQuery && Object.keys(availabilityQuery).length > 0) { // Get Career by Zip Code and Radius - Filter by Availability
       const requestedDays = Object.keys(availabilityQuery);
       items = items.then(itemsArray => {
-        return itemsArray.filter(doctor => {
+        return itemsArray.filter(professional => {
           return requestedDays.reduce((bool, day) => {
-            if (doctor.scheduling[day] || bool) {
+            if (professional.scheduling[day] || bool) {
               bool = true;
               return bool;
             }
@@ -108,7 +112,7 @@ exports.handler = (event, context, callback) => {
         });
       });
     }
-  } else { // Get All Doctors
+  } else { // Get All Professionals
     items = dynamodb.scan(params).promise().then(data => data.Items);
   }
 
@@ -116,7 +120,7 @@ exports.handler = (event, context, callback) => {
     if (!data.length) {
       response = {
         statusCode: 404,
-        body: 'No doctors found matching your search criteria'
+        body: 'No professionals found matching your search criteria'
       };
 
       callback(JSON.stringify(response));
@@ -124,26 +128,26 @@ exports.handler = (event, context, callback) => {
 
     if (zipCodeQuery) {
       return new Promise((resolve, reject) => {
-        // Add Distance Parameter Between Student and Doctors
-        const destinations = data.map(doctor => `${doctor.address.streetAddress} ${doctor.address.city}, ${doctor.address.state} ${doctor.address.zipCode}`);
+        // Add Distance Parameter Between Student and Professional
+        const destinations = data.map(professional => `${professional.address.streetAddress} ${professional.address.city}, ${professional.address.state} ${professional.address.zipCode}`);
         const origins = [zipCodeQuery];
         distance.key('AIzaSyBV0ERwNWnf4cLICe7TozgRJG6jNM5aL9Q');
         distance.mode('driving');
 
         distance.matrix(origins, destinations, function (err, distances) {
           if (err) {
-            reject('Error calculating distances to doctors.');
+            reject('Error calculating distances to professionals.');
           }
 
           if (distances.status == 'OK') {
             const distanceValues = distances.rows[0].elements.map(el => el);
-            resolve(data.map((doctor, index) => {
-              return Object.assign({}, doctor, {
+            resolve(data.map((professionals, index) => {
+              return Object.assign({}, professionals, {
                 distance: distanceValues[index]
               });
             }));
           } else {
-            reject('Error calculating distances to doctors.');
+            reject('Error calculating distances to professionalss.');
           }
         });
       });
