@@ -7,6 +7,7 @@ exports.schema = joi.object().keys({
   specialty: joi.string(),
   email: joi.string().email({ minDomainAtoms: 2 }).required(),
   id: joi.string().required(),
+  gender: joi.string().required(),
   phoneNumber: joi.string().min(10),
   address: joi.object().keys({
     streetAddress: joi.string(),
