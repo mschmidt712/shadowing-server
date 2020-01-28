@@ -1,13 +1,10 @@
 const AWS = require('aws-sdk');
 const joi = require('joi');
 const orgSchema = require('./organization-schema.js');
-const formatOrganizationValue = require('./format-organization-value');
 
 exports.handler = (event, context, callback) => {
   let response;
-  let organization = Object.assign({}, event.organization, {
-    value: formatOrganizationValue(event.organization)
-  });
+  let organization = event.organization;
 
   const validatedInput = joi.validate(organization, orgSchema.schema, {
     stripUnknown: true
