@@ -5,6 +5,7 @@ exports.schema = joi.object().keys({
   student: joi.string().required(),
   doctor: joi.string().required(),
   scheduling: joi.object().required(),
+  organizations: joi.array().required(),
   status: joi.string().valid(['approved', 'denied', 'pending']),
   createdDate: joi.string().isoDate(),
   uuid: joi.string().uuid(),
